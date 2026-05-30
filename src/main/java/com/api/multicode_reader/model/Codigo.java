@@ -4,10 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
-
 @Entity
-@Table(name = "codigo")
+@Table(name = "Codigo")
 @Getter
 @Setter
 public class Codigo {
@@ -15,9 +13,12 @@ public class Codigo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "familia", nullable = false)
     private String familia;
-    private String articulo;
-    private int cantidad;
 
-    private List<Pedido>
+    @Column(name = "articulo", nullable = false)
+    private String articulo;
+
+    @Column(name = "decrcipcion", nullable = true)
+    private String descripcion;
 }

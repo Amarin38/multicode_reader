@@ -1,13 +1,16 @@
 package com.api.multicode_reader.model;
 
+import com.api.multicode_reader.constants.TipoPedidoEnum;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.sql.Timestamp;
+import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@Table(name="pedido")
+@Table(name="Pedido")
 @Getter
 @Setter
 public class Pedido {
@@ -15,9 +18,24 @@ public class Pedido {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Timestamp fecha_pedido;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "codigo_id")
-    private Codigo codigo;
+    @Column(name = "razon_social", nullable = false)
+    private String razonSocial;
+
+    @Column(name = "fecha_pedido", nullable = false)
+    private Date fechaPedido;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_pedido", nullable = false)
+    private TipoPedidoEnum tipoPedido;
+
+    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DetallePedido> detalles = new ArrayList<>();
+
+
+    public void agregarDetalle(DetallePedido detalle) {
+        detalles.add(detalle);
+        detalle.setPedido(this);
+    }
+
 
 }
