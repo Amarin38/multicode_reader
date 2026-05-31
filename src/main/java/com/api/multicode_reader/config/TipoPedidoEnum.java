@@ -1,4 +1,4 @@
-package com.api.multicode_reader.constants;
+package com.api.multicode_reader.config;
 
 public enum TipoPedidoEnum {
     NORMAL,

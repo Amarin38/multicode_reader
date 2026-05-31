@@ -24,5 +24,5 @@ public class DetallePedido {
     private Codigo codigo;
 
     @Column(name = "cantidad", nullable = false)
-    private int cantidad;
+    private double cantidad;
 }

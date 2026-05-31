@@ -8,20 +8,20 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@AllArgsConstructor
 @Service
+@AllArgsConstructor
 @Transactional(readOnly = true)
 public class CodigoService {
     private final CodigoRepository codigoRepository;
 
     @Transactional
-    public void save(Codigo codigo){
+    public void addCodigo(Codigo codigo){
         codigo.setFamilia(codigo
-                            .getFamilia()
-                            .strip());
+                .getFamilia()
+                .strip());
         codigo.setArticulo(codigo
-                            .getArticulo()
-                            .strip());
+                .getArticulo()
+                .strip());
 
         codigoRepository.save(codigo);
     }
@@ -30,26 +30,11 @@ public class CodigoService {
     public void update(Long id, Codigo datosNuevos) {
         Codigo codigoExistente = findById(id);
 
-        codigoExistente.setFamilia(datosNuevos
-                                    .getFamilia()
-                                    .strip());
-        codigoExistente.setArticulo(datosNuevos
-                                    .getArticulo()
-                                    .strip());
-        codigoExistente.setDescripcion(datosNuevos
-                                        .getDescripcion()
-                                        .strip());
+        codigoExistente.setFamilia(datosNuevos.getFamilia().strip());
+        codigoExistente.setArticulo(datosNuevos.getArticulo().strip());
+        codigoExistente.setDescripcion(datosNuevos.getDescripcion().strip());
 
         codigoRepository.save(codigoExistente);
-    }
-
-    @Transactional
-    public void delete(Long id){
-        codigoRepository.deleteById(id);
-    }
-
-    public List<Codigo> findAll() {
-        return codigoRepository.findAll();
     }
 
     public Codigo findById(long id) {

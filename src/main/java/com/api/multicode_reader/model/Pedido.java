@@ -1,6 +1,6 @@
 package com.api.multicode_reader.model;
 
-import com.api.multicode_reader.constants.TipoPedidoEnum;
+import com.api.multicode_reader.config.TipoPedidoEnum;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

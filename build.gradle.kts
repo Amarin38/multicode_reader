@@ -25,6 +25,7 @@ dependencies {
 	// Flyway
 	implementation("org.flywaydb:flyway-core")
 	implementation("org.flywaydb:flyway-mysql")
+	implementation("org.springframework.boot:spring-boot-starter-validation")
 
 	// 2. EL DRIVER FALTANTE: Esencial para que Java se conecte a MariaDB
 	runtimeOnly("org.mariadb.jdbc:mariadb-java-client")

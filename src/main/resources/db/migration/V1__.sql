@@ -9,7 +9,7 @@ CREATE TABLE codigo
 
 CREATE TABLE detalle_pedido
 (
-    cantidad  INT    NOT NULL,
+    cantidad  DOUBLE NOT NULL,
     pedido_id BIGINT NOT NULL,
     codigo_id BIGINT NOT NULL,
     CONSTRAINT pk_detallepedido PRIMARY KEY (pedido_id, codigo_id)
