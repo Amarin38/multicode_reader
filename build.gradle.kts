@@ -21,14 +21,13 @@ dependencies {
 	// 1. Herramientas Web y Base de Datos
 	implementation("org.springframework.boot:spring-boot-starter-webmvc")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+	runtimeOnly("org.postgresql:postgresql")
 
 	// Flyway
 	implementation("org.flywaydb:flyway-core")
 	implementation("org.flywaydb:flyway-mysql")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
-
-	// 2. EL DRIVER FALTANTE: Esencial para que Java se conecte a MariaDB
-	runtimeOnly("org.mariadb.jdbc:mariadb-java-client")
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.2")
 
 	// 3. Herramientas de Desarrollo (Lombok y DevTools)
 	compileOnly("org.projectlombok:lombok")
