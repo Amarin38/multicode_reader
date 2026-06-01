@@ -1,12 +1,15 @@
 package com.api.multicode_reader.service;
 
+import com.api.multicode_reader.dto.codigo.ActualizarCodigoRequestDTO;
+import com.api.multicode_reader.dto.codigo.CrearCodigoRequestDTO;
+import com.api.multicode_reader.mapper.CodigoMapper;
 import com.api.multicode_reader.model.Codigo;
 import com.api.multicode_reader.repository.CodigoRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -15,26 +18,28 @@ public class CodigoService {
     private final CodigoRepository codigoRepository;
 
     @Transactional
-    public void addCodigo(Codigo codigo){
-        codigo.setFamilia(codigo
-                .getFamilia()
-                .strip());
-        codigo.setArticulo(codigo
-                .getArticulo()
-                .strip());
-
+    public void crearCodigo(CrearCodigoRequestDTO dto){
+        Codigo codigo = CodigoMapper.crearToEntity(dto);
         codigoRepository.save(codigo);
     }
 
     @Transactional
-    public void update(Long id, Codigo datosNuevos) {
+    public Codigo actualizarCodigo(Long id, ActualizarCodigoRequestDTO dto) {
         Codigo codigoExistente = findById(id);
 
-        codigoExistente.setFamilia(datosNuevos.getFamilia().strip());
-        codigoExistente.setArticulo(datosNuevos.getArticulo().strip());
-        codigoExistente.setDescripcion(datosNuevos.getDescripcion().strip());
+        Optional.ofNullable(dto.familia())
+                .filter(fam -> !fam.isBlank())
+                .ifPresent(codigoExistente::setFamilia);
 
-        codigoRepository.save(codigoExistente);
+        Optional.ofNullable(dto.articulo())
+                .filter(art -> !art.isBlank())
+                .ifPresent(codigoExistente::setArticulo);
+
+        Optional.ofNullable(dto.descripcion())
+                .filter(desc -> !desc.isBlank())
+                .ifPresent(codigoExistente::setDescripcion);
+
+        return codigoExistente;
     }
 
     public Codigo findById(long id) {
