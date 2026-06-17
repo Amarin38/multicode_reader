@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lector QR Modular</title>
+
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script defer src="procesar_imagen.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body>
+
+<div x-data="escanerCamara()" x-init="iniciarEscaner()">
+
+    <h2>Lector de Códigos</h2>
+    <div id="lector-camara" style="width: 100%; max-width: 500px;"></div>
+
+    <div x-show="codigoLeido !== ''" style="margin-top: 20px; padding: 10px; background: #e0f7fa;">
+        <h3>Código detectado: <strong x-text="codigoLeido"></strong></h3>
+        <button @click="reiniciarLector()">Escanear otro código</button>
+    </div>
+
+    <p x-show="codigoLeido === ''">Apunta la cámara al código...</p>
+
+</div>
+</body>
+</html>
