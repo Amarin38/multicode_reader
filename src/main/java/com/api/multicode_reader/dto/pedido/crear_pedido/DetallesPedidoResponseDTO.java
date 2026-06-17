@@ -1,5 +1,5 @@
 package com.api.multicode_reader.dto.pedido.crear_pedido;
 
-public record CodigosPedidoResponseDTO(
+public record DetallesPedidoResponseDTO(
         Long codigoId, double canitdad
 ){}

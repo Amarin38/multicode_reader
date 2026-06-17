@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
 
 public record CrearPedidoRequestDTO(
@@ -23,9 +24,9 @@ public record CrearPedidoRequestDTO(
 
         @NotEmpty(message = "La lista de empleados no puede estar vacía.")
         @Valid
-        List<EmpleadosPedidoRequestDTO> empleadosAsignados,
+        HashSet<EmpleadosPedidoRequestDTO> empleadosAsignados,
 
         @NotEmpty(message = "La lista de artículos no puede estar vacía.")
         @Valid
-        List<CodigosPedidoRequestDTO> articulosPedidos
+        List<DetallesPedidoRequestDTO> articulosPedidos
 ) {}

@@ -1,8 +1,9 @@
 package com.api.multicode_reader.service;
 
 import com.api.multicode_reader.config.EstadoEnum;
-import com.api.multicode_reader.dto.pedido.crear_pedido.CodigosPedidoRequestDTO;
-import com.api.multicode_reader.dto.pedido.crear_pedido.CodigosPedidoResponseDTO;
+import com.api.multicode_reader.dto.pedido.ActualizarPedidoRequestDTO;
+import com.api.multicode_reader.dto.pedido.crear_pedido.DetallesPedidoRequestDTO;
+import com.api.multicode_reader.dto.pedido.crear_pedido.DetallesPedidoResponseDTO;
 import com.api.multicode_reader.dto.pedido.crear_pedido.CrearPedidoRequestDTO;
 import com.api.multicode_reader.dto.pedido.crear_pedido.EmpleadosPedidoRequestDTO;
 import com.api.multicode_reader.model.*;
@@ -13,7 +14,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -32,41 +35,83 @@ public class PedidoService {
         nuevoPedido.setTipoPedido(dto.tipo_pedido());
         nuevoPedido.setEstado(EstadoEnum.PENDIENTE);
 
-        // Agrego empleados asignados al pedido
-        for(EmpleadosPedidoRequestDTO empleados: dto.empleadosAsignados()) {
-            Empleado empleado = empleadoService.findById(empleados.empleadoId());
-            EmpleadoAsignado empleadoAsignado = new EmpleadoAsignado();
-
-            empleadoAsignado.setId(new EmpleadoAsignadoId()); // le seteo el id como compuesto
-            empleadoAsignado.setEmpleado(empleado);
-
-            nuevoPedido.agregarEmpleadosAsignados(empleadoAsignado);
-        }
-
-        // Agregp detalles al pedido
-        for(CodigosPedidoRequestDTO articulo: dto.articulosPedidos()) {
-            Codigo codigo = codigoService.findById(articulo.codigoId());
-
-            DetallePedido detallePedido = new DetallePedido();
-            detallePedido.setId(new DetallePedidoId()); // le seteo el id como compuesto
-            detallePedido.setCodigo(codigo);
-            detallePedido.setCantidad(articulo.cantidad());
-
-            nuevoPedido.agregarDetalle(detallePedido);
-        }
+        agregarEmpleados(nuevoPedido, dto.empleadosAsignados());
+        agregarDetalles(nuevoPedido, dto.articulosPedidos());
 
         return pedidoRepository.save(nuevoPedido);
     }
 
     @Transactional
-    public Pedido actualizarPedido()
+    public Pedido actualizarPedido(Long id, ActualizarPedidoRequestDTO dto){
+        Pedido pedidoExistente = findById(id);
 
-    public Pedido obtenerPedidoPorId(Long pedidoId) {
+        Optional.ofNullable(dto.tipoPedido())
+                .ifPresent(pedidoExistente::setTipoPedido);
+
+        Optional.ofNullable(dto.razonSocial())
+                .filter(razon -> !razon.isBlank())
+                .ifPresent(pedidoExistente::setRazonSocial);
+
+        Optional.ofNullable(dto.pedidosDetalles())
+                .filter(listaArt -> !listaArt.isEmpty())
+                .ifPresent(detalles -> agregarDetalles(pedidoExistente, detalles));
+
+        Optional.ofNullable(dto.empleadosAsignados())
+                .filter(listaEmple -> !listaEmple.isEmpty())
+                .ifPresent(empleados -> agregarEmpleados(pedidoExistente, empleados));
+
+        return pedidoExistente;
+    }
+
+    private void agregarEmpleados(Pedido pedido, HashSet<EmpleadosPedidoRequestDTO> empleadosDTO) {
+        for(EmpleadosPedidoRequestDTO dto: empleadosDTO) {
+            boolean exists = pedido.getEmpleadosAsignados()
+                    .stream()
+                    .anyMatch(empleAsign -> empleAsign.getEmpleado()
+                                                                        .getId()
+                                                                        .equals(dto.empleadoId())
+                    );
+
+            if(!exists) {
+                Empleado empleado = empleadoService.findById(dto.empleadoId());
+                EmpleadoAsignado empleadoAsignado = new EmpleadoAsignado();
+
+                empleadoAsignado.setId(new EmpleadoAsignadoId()); // le seteo el id como compuesto
+                empleadoAsignado.setEmpleado(empleado);
+
+                pedido.agregarEmpleadosAsignados(empleadoAsignado);
+            }
+        }
+    }
+
+    private void agregarDetalles(Pedido pedido, List<DetallesPedidoRequestDTO> codigosDTO) {
+        for (DetallesPedidoRequestDTO dto : codigosDTO) {
+            boolean exists = pedido.getPedidosDetalles()
+                                   .stream()
+                                   .anyMatch(detPed -> detPed.getCodigo()
+                                                                            .getId()
+                                                                            .equals(dto.codigoId())
+                                   );
+
+            if (!exists) {
+                Codigo codigo = codigoService.findById(dto.codigoId());
+
+                DetallePedido detallePedido = new DetallePedido();
+                detallePedido.setId(new DetallePedidoId()); // le seteo el id como compuesto
+                detallePedido.setCodigo(codigo);
+                detallePedido.setCantidad(dto.cantidad());
+
+                pedido.agregarDetalle(detallePedido);
+            }
+        }
+    }
+
+    public Pedido findById(Long pedidoId) {
         return pedidoRepository.findById(pedidoId)
                                .orElseThrow(() -> new RuntimeException("Pedido no encontrado."));
     }
 
-    public List<CodigosPedidoResponseDTO> obtenerDetallePedidoPorId(Long pedidoId) {
+    public List<DetallesPedidoResponseDTO> obtenerDetallePedidoPorId(Long pedidoId) {
         return pedidoRepository.obtenerResumenDetallesPorPedido(pedidoId);
     }
 }

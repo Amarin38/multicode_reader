@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 @Entity
@@ -36,8 +37,8 @@ public class Pedido {
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DetallePedido> pedidosDetalles = new ArrayList<>();
 
-    @OneToMany(mappedBy = "empleado", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<EmpleadoAsignado> empleadosAsignados = new ArrayList<>();
+    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
+    private HashSet<EmpleadoAsignado> empleadosAsignados = new HashSet<>();
 
     public void agregarEmpleadosAsignados(EmpleadoAsignado empleado) {
         empleadosAsignados.add(empleado);
