@@ -11,14 +11,11 @@ import lombok.Setter;
 public class Codigo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long codigoId;
 
-    @Column(name = "familia", nullable = false)
-    private String familia;
+    @Column(name = "codigo", nullable = false)
+    private String codigo;
 
-    @Column(name = "articulo", nullable = false)
-    private String articulo;
-
-    @Column(name = "decrcipcion", nullable = true)
+    @Column(name = "decrcipcion")
     private String descripcion;
 }

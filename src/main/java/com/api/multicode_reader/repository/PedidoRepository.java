@@ -14,7 +14,7 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
     // Pide los datos a través de un requestDTO
     // Devuelve los datos a través de un responseDTO
     @Query("""
-            SELECT new com.api.multicode_reader.dto.pedido.crear_pedido.DetallesPedidoRequestDTO(d.codigo.id, d.cantidad)
+            SELECT new com.api.multicode_reader.dto.pedido.crear_pedido.DetallesPedidoRequestDTO(d.codigo.codigo, d.cantidad)
             FROM DetallePedido d WHERE d.pedido.id = :pedidoId
            """)
     List<DetallesPedidoResponseDTO> obtenerResumenDetallesPorPedido(@Param("pedidoId") Long pedidoId);

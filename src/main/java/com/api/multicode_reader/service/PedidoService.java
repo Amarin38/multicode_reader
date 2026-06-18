@@ -86,23 +86,14 @@ public class PedidoService {
 
     private void agregarDetalles(Pedido pedido, List<DetallesPedidoRequestDTO> codigosDTO) {
         for (DetallesPedidoRequestDTO dto : codigosDTO) {
-            boolean exists = pedido.getPedidosDetalles()
-                                   .stream()
-                                   .anyMatch(detPed -> detPed.getCodigo()
-                                                                            .getId()
-                                                                            .equals(dto.codigoId())
-                                   );
+            Codigo codigo = codigoService.findByCodigo(dto.codigo());
 
-            if (!exists) {
-                Codigo codigo = codigoService.findById(dto.codigoId());
+            DetallePedido detallePedido = new DetallePedido();
+            detallePedido.setId(new DetallePedidoId()); // le seteo el id como compuesto
+            detallePedido.setCodigo(codigo);
+            detallePedido.setCantidad(dto.cantidad());
 
-                DetallePedido detallePedido = new DetallePedido();
-                detallePedido.setId(new DetallePedidoId()); // le seteo el id como compuesto
-                detallePedido.setCodigo(codigo);
-                detallePedido.setCantidad(dto.cantidad());
-
-                pedido.agregarDetalle(detallePedido);
-            }
+            pedido.agregarDetalle(detallePedido);
         }
     }
 

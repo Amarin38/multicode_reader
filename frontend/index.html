@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lector QR Modular</title>
+    <title>Lector Controlado</title>
 
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script defer src="procesar_imagen.js"></script>
@@ -13,16 +13,55 @@
 
 <div x-data="escanerCamara()" x-init="iniciarEscaner()">
 
-    <h2>Lector de Códigos</h2>
-    <div id="lector-camara" style="width: 100%; max-width: 500px;"></div>
+    <h2>Lector de códigos</h2>
 
-    <div x-show="codigoLeido !== ''" style="margin-top: 20px; padding: 10px; background: #e0f7fa;">
-        <h3>Código detectado: <strong x-text="codigoLeido"></strong></h3>
-        <button @click="reiniciarLector()">Escanear otro código</button>
+    <div id="lector-camara" style="width: 100%; max-width: 500px; background-color: #000;"></div>
+
+    <div x-show="codigoLeido !== ''" style="margin-top: 20px; padding: 15px; background: #e0f7fa; border-radius: 5px;">
+        <p>✅ Código: <strong x-text="codigoLeido"></strong></p>
+
+        <div style="margin: 15px 0;">
+            <label style="display: block; font-weight: bold; margin-bottom: 5px;">Cantidad / Dato adicional:</label>
+            <input
+                    type="number"
+                    x-model.number="cantidad"
+                    placeholder="Ej: 1"
+                    style="padding: 8px; width: 80%; max-width: 300px;"
+            >
+        </div>
+
+        <button @click="guardarItem()" style="padding: 8px 15px; background: #4CAF50; color: white; border: none; cursor: pointer;">Guardar</button>
+        <button @click="cancelarLectura()" style="padding: 8px 15px; background: #f44336; color: white; border: none; margin-left: 10px; cursor: pointer;">Descartar</button>
     </div>
 
-    <p x-show="codigoLeido === ''">Apunta la cámara al código...</p>
+    <p x-show="codigoLeido === '' && camaraEncendida">Apunta al código de barras...</p>
+    <p x-show="!camaraEncendida && codigoLeido === ''">Cargando cámara...</p>
 
+    <hr style="margin-top: 30px; border: 0; border-top: 1px solid #ccc;">
+
+    <h3>Listado de Lecturas (<span x-text="listaCodigos.length"></span>)</h3>
+
+    <p x-show="listaCodigos.length === 0" style="color: #666;">El historial está vacío.</p>
+
+    <ul>
+        <template x-for="(item, index) in listaCodigos" :key="index">
+            <li style="margin-bottom: 8px; font-family: monospace;">
+                📦 <span x-text="item.codigo"></span> (<span x-text="item.cantidad"></span>)
+
+                <button @click="eliminarCodigo(index)" style="margin-left: 15px; padding: 2px 6px; cursor: pointer; color: red;">Eliminar</button>
+            </li>
+        </template>
+    </ul>
+
+    <div style="margin-top: 20px;" x-show="listaCodigos.length > 0">
+        <button
+                @click="enviarDatos()"
+                style="padding: 10px 20px; background: #2196F3; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; width: 100%;"
+        >
+            📤 Enviar al Servidor
+        </button>
+    </div>
 </div>
+
 </body>
 </html>

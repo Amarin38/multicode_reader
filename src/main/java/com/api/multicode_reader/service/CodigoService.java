@@ -24,16 +24,12 @@ public class CodigoService {
     }
 
     @Transactional
-    public Codigo actualizarCodigo(Long id, ActualizarCodigoRequestDTO dto) {
-        Codigo codigoExistente = findById(id);
-
-        Optional.ofNullable(dto.familia())
-                .filter(fam -> !fam.isBlank())
-                .ifPresent(codigoExistente::setFamilia);
+    public Codigo actualizarCodigo(String id, ActualizarCodigoRequestDTO dto) {
+        Codigo codigoExistente = findByCodigo(id);
 
         Optional.ofNullable(dto.articulo())
-                .filter(art -> !art.isBlank())
-                .ifPresent(codigoExistente::setArticulo);
+                .filter(cod -> !cod.isBlank())
+                .ifPresent(codigoExistente::setCodigo);
 
         Optional.ofNullable(dto.descripcion())
                 .filter(desc -> !desc.isBlank())
@@ -42,22 +38,12 @@ public class CodigoService {
         return codigoExistente;
     }
 
-    public Codigo findById(long id) {
-        return codigoRepository
-                .findById(id)
-                .orElseThrow(() -> new RuntimeException("Código no encontrado"));
-    }
-
     public Codigo findByCodigo(String codigo) {
         String[] codigo_separado = codigo.split("\\.");
         String familia = codigo_separado[0];
         String articulo =  codigo_separado[1];
 
-        return codigoRepository.findByFamiliaLikeAndArticuloLike(familia.strip(), articulo.strip());
-    }
-
-    public Codigo findByFamilia(String familia) {
-        return codigoRepository.findByFamiliaLike(familia.strip());
+        return codigoRepository.findByCodigoLike(codigo);
     }
 }
 

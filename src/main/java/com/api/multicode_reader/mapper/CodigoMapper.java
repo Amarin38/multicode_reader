@@ -11,8 +11,7 @@ public class CodigoMapper {
     public static Codigo crearToEntity(CrearCodigoRequestDTO dto){
         Codigo codigo = new Codigo();
 
-        codigo.setFamilia(dto.familia().strip());
-        codigo.setArticulo(dto.articulo().strip());
+        codigo.setCodigo(dto.codigo().strip());
         codigo.setDescripcion(dto.descripcion().strip());
 
         return codigo;
