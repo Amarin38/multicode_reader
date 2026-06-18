@@ -30,13 +30,12 @@ public class PedidoService {
     public Pedido crearNuevoPedido(CrearPedidoRequestDTO dto) {
         Pedido nuevoPedido = new Pedido();
 
-        nuevoPedido.setRazonSocial(dto.razon_social());
-        nuevoPedido.setFechaPedido(dto.fecha_pedido());
-        nuevoPedido.setTipoPedido(dto.tipo_pedido());
+        nuevoPedido.setRazonSocial(dto.razonSocial());
+        nuevoPedido.setFechaPedido(dto.fecha());
         nuevoPedido.setEstado(EstadoEnum.PENDIENTE);
 
-        agregarEmpleados(nuevoPedido, dto.empleadosAsignados());
-        agregarDetalles(nuevoPedido, dto.articulosPedidos());
+//        agregarEmpleados(nuevoPedido, dto.empleadosAsignados());
+        agregarDetalles(nuevoPedido, dto.codigos());
 
         return pedidoRepository.save(nuevoPedido);
     }
@@ -63,21 +62,23 @@ public class PedidoService {
         return pedidoExistente;
     }
 
-    private void agregarEmpleados(Pedido pedido, HashSet<EmpleadosPedidoRequestDTO> empleadosDTO) {
+    private void agregarEmpleados(Pedido pedido, List<EmpleadosPedidoRequestDTO> empleadosDTO) {
         for(EmpleadosPedidoRequestDTO dto: empleadosDTO) {
+
+
             boolean exists = pedido.getEmpleadosAsignados()
                     .stream()
                     .anyMatch(empleAsign -> empleAsign.getEmpleado()
-                                                                        .getId()
-                                                                        .equals(dto.empleadoId())
+                                                                        .getNombre()
+                                                                        .equals(dto.nombre())
                     );
 
             if(!exists) {
-                Empleado empleado = empleadoService.findById(dto.empleadoId());
+                List<Empleado> empleados = empleadoService.findByNombre(dto.nombre());
                 EmpleadoAsignado empleadoAsignado = new EmpleadoAsignado();
 
                 empleadoAsignado.setId(new EmpleadoAsignadoId()); // le seteo el id como compuesto
-                empleadoAsignado.setEmpleado(empleado);
+                empleadoAsignado.setEmpleado(empleados.getFirst());
 
                 pedido.agregarEmpleadosAsignados(empleadoAsignado);
             }

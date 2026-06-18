@@ -6,5 +6,5 @@ import jakarta.validation.constraints.NotNull;
 public record EmpleadosPedidoRequestDTO(
         @NotNull(message = "El id del empleado es obligatorio.")
         @Min(1)
-        Long empleadoId
+        String nombre
 ) {}

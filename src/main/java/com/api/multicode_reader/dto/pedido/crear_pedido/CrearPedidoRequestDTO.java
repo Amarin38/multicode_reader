@@ -1,6 +1,5 @@
 package com.api.multicode_reader.dto.pedido.crear_pedido;
 
-import com.api.multicode_reader.config.TipoPedidoEnum;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
@@ -13,20 +12,17 @@ import java.util.List;
 
 public record CrearPedidoRequestDTO(
         @NotBlank(message = "La razón social no puede estar vacía.")
-        String razon_social,
+        String razonSocial,
 
         @NotNull(message = "La fecha no puede estar vacía.")
         @FutureOrPresent
-        LocalDate fecha_pedido,
-
-        @NotNull(message = "El tipo de pedido no puede estar vacío.")
-        TipoPedidoEnum tipo_pedido,
+        LocalDate fecha,
 
         @NotEmpty(message = "La lista de empleados no puede estar vacía.")
         @Valid
-        HashSet<EmpleadosPedidoRequestDTO> empleadosAsignados,
+        List<String> empleadosAsignados,
 
         @NotEmpty(message = "La lista de artículos no puede estar vacía.")
         @Valid
-        List<DetallesPedidoRequestDTO> articulosPedidos
+        List<DetallesPedidoRequestDTO> codigos
 ) {}

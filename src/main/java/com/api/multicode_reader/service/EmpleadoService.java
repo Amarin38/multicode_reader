@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -36,6 +37,10 @@ public class EmpleadoService {
                 .ifPresent(empleadoExistente::setApellido);
 
         return empleadoExistente;
+    }
+
+    public List<Empleado> findByNombre(String nombre) {
+        return empleadoRepository.findFirstByNombre(nombre);
     }
 
     public Empleado findById(Long id){

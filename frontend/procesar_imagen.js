@@ -1,18 +1,49 @@
-// Archivo: lector.js
+const EmpleadoEnum = Object.freeze({
+    PRUEBA1: "Prueba1",
+    PRUEBA2: "Prueba2",
+    PRUEBA3: "Prueba3"
+});
+
+const PantallaEnum = Object.freeze({
+   CONFIGURACION: "Configuracion",
+   ESCANER: "Escaner"
+});
 
 document.addEventListener('alpine:init', () => {
-    Alpine.data('escanerCamara', () => ({
+    const ipActual = window.location.hostname;
 
+    Alpine.data('escanerCamara', () => ({
+        // --- CONTROL DE PANTALLA ---
+        pantallaActual: PantallaEnum.CONFIGURACION,
+
+        // --- DATOS DEL PEDIDO ---
+        razonSocial: '',
+        fecha: new Date().toLocaleDateString('es-ES'),
+        empleadoAsignado: '',
+
+        // --- DATOS DEL SCANER ---
         codigoLeido: '',
         cantidad: 1,
         listaCodigos: [],
         html5QrCode: null,
         camaraEncendida: false,
 
-        iniciarEscaner() {
-            const self = this;
-            const ipActual = window.location.hostname;
+        iniciarEscaneo() {
+            if (this.razonSocial && this.empleadoAsignado) {
+                this.pantallaActual = PantallaEnum.ESCANER;
+                this.escanear();
+            } else {
+                alert("Por favor, completa los campos.");
+            }
+        },
 
+        volver() {
+            this.pantallaActual = PantallaEnum.CONFIGURACION;
+            this.detenerEscaner();
+        },
+
+        escanear() {
+            const self = this;
             self.html5QrCode = new Html5Qrcode("lector-camara");
 
             self.html5QrCode.start(
@@ -20,59 +51,42 @@ document.addEventListener('alpine:init', () => {
                 {
                     fps: 30,
                     qrbox: { width: 350, height: 150 },
-                    formatsToSupport: [
-                        Html5QrcodeSupportedFormats.CODE_128,
-                        Html5QrcodeSupportedFormats.EAN_13
-                    ]
+                    formatsToSupport: [Html5QrcodeSupportedFormats.CODE_128, Html5QrcodeSupportedFormats.EAN_13]
                 },
                 (codigo) => {
-                    const formatoDeseado = /^\d{3}\.\d{5}$/;
-
-                    if (codigo && codigo.trim() !== '' && formatoDeseado.test(codigo)) {
-
+                    const formato = /^\d{3}\.\d{5}$/;
+                    if (codigo && codigo.trim() !== '' && formato.test(codigo)) {
                         self.codigoLeido = codigo;
                         self.detenerEscaner();
-
-                    } else {
-                        console.log("Se leyó un código, pero no tiene el formato 000.00000:", codigo);
                     }
                 },
                 (error) => {}
-            ).then(() => {
-                self.camaraEncendida = true;
-            }).catch((err) => {
-                console.error("No se pudo iniciar la cámara:", err);
-            });
+            ).then(() => { self.camaraEncendida = true; })
+                .catch((err) => { console.error(err); });
         },
 
         detenerEscaner() {
-            const self = this;
-            if (self.html5QrCode && self.camaraEncendida) {
-                self.html5QrCode.stop().then(() => {
-                    self.camaraEncendida = false;
-                }).catch((err) => console.error(err));
+            if (this.html5QrCode && this.camaraEncendida) {
+                this.html5QrCode.stop().then(() => { this.camaraEncendida = false; });
             }
         },
 
         guardarItem() {
             if (this.codigoLeido !== '') {
-                let cantidadEntera = parseInt(this.cantidad, 10) || 0;
-
                 this.listaCodigos.push({
                     codigo: this.codigoLeido,
-                    cantidad: cantidadEntera
+                    cantidad: parseInt(this.cantidad, 10) || 0
                 });
-
                 this.codigoLeido = '';
-                this.cantidad = '';
-                this.iniciarEscaner();
+                this.cantidad = 1;
+                this.escanear();
             }
         },
 
         cancelarLectura() {
             this.codigoLeido = '';
-            this.datoExtra = '';
-            this.iniciarEscaner();
+            this.cantidad = 0;
+            this.escanear();
         },
 
         eliminarCodigo(index) {
@@ -80,31 +94,28 @@ document.addEventListener('alpine:init', () => {
         },
 
         async enviarDatos() {
-            if (this.listaCodigos.length === 0) {
-                alert("No hay códigos para enviar.")
-                return;
-            }
+            console.log("Intentando enviar:", this.listaCodigos);
+            if (this.listaCodigos.length === 0) return alert("No hay códigos.");
+
+            const payload = {
+                razonSocial: this.razonSocial,
+                fecha: this.fecha,
+                empleadosAsignados: [this.empleadoAsignado],
+                codigos: this.listaCodigos
+            };
 
             try {
-                const urlBackend = `http://${ipActual}:8080/api/pedido/guardar`;
-
-                const respuesta = await fetch(urlBackend, {
+                const respuesta = await fetch(`http://${ipActual}:8080/api/pedido/guardar`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(this.listaCodigos)
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
                 });
                 if (respuesta.ok) {
-                    alert("Datos guardados correctamente.");
+                    alert("Datos guardados.");
                     this.listaCodigos = [];
-                } else {
-                    alert("error al guardar: " + respuesta.status);
+                    this.volver();
                 }
-            } catch (error){
-                console.error("Error de conexión:", error);
-                alert("No se pudo conectar con el servidor.")
-            }
+            } catch (error) { alert("Error de conexión"); }
         }
     }))
 })

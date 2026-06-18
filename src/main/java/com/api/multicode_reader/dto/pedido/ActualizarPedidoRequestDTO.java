@@ -10,6 +10,6 @@ import java.util.List;
 public record ActualizarPedidoRequestDTO(
         String razonSocial,
         TipoPedidoEnum tipoPedido,
-        HashSet<EmpleadosPedidoRequestDTO> empleadosAsignados,
+        List<EmpleadosPedidoRequestDTO> empleadosAsignados,
         List<DetallesPedidoRequestDTO> pedidosDetalles
 ) {}
