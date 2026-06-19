@@ -9,6 +9,8 @@ const PantallaEnum = Object.freeze({
    ESCANER: "Escaner"
 });
 
+const codigoBarrasRegex = /^\d{3}\.\d{5}$/;
+
 document.addEventListener('alpine:init', () => {
     const ipActual = window.location.hostname;
 
@@ -54,8 +56,9 @@ document.addEventListener('alpine:init', () => {
                     formatsToSupport: [Html5QrcodeSupportedFormats.CODE_128, Html5QrcodeSupportedFormats.EAN_13]
                 },
                 (codigo) => {
-                    const formato = /^\d{3}\.\d{5}$/;
-                    if (codigo && codigo.trim() !== '' && formato.test(codigo)) {
+                    // const formato = /^\d{3}\.\d{5}$/;
+                    if (codigo && codigo.trim() !== '' && codigoBarrasRegex.test(codigo)) {
+                        if (navigator.vibrate) navigator.vibrate(200);
                         self.codigoLeido = codigo;
                         self.detenerEscaner();
                     }

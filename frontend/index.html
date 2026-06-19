@@ -2,18 +2,19 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sistema de Pedidos</title>
+
+    <link rel="stylesheet" href="styles.css">
+
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script defer src="procesar_imagen.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <style>
-        [x-cloak] { display: none !important; }
-    </style>
 </head>
 <body>
 
 
-<div x-data="escanerCamara()" style="padding: 20px;" x-cloak>
+<div x-data="escanerCamara()" class="app-container" x-cloak>
     <div x-show="pantallaActual === PantallaEnum.CONFIGURACION">
         <h2>Configuración del Pedido</h2>
 
@@ -42,7 +43,7 @@
         <div x-show="codigoLeido !== ''" style="margin-top: 15px; background: #f0f0f0; padding: 10px;">
             <p>Código detectado: <strong x-text="codigoLeido"></strong></p>
             <label>Cantidad:</label>
-            <input type="number" x-model="cantidad">
+            <input type="number" x-model="cantidad" inputmode="numeric" pattern="[0-9]*">
             <button @click="guardarItem()">Agregar a Lista</button>
         </div>
 
